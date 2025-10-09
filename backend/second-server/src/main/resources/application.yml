@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+  #文件上传的配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  redis:
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    auth: ${sky.redis.auth}
+    database: ${sky.redis.database}
+
+mybatis-plus:
+  type-aliases-package: com.sky.entity #别名扫描包
+  mapper-locations: "classpath*:/mapper/**/*.xml" #Mappe.xml文件地址，默认值
+  configuration:
+    map-underscore-to-camel-case: true #开启下划线和驼峰命名映射
+    cache-enabled: false #是否开启二级缓存
+    efault-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler #k开启枚举处理器
+  global-config:
+    db-config:
+      id-type: auto #id为自生成生成
+      update-strategy: not_null #更新策略：只更新非空字段
+      logic-delete-field: deleted #配置逻辑删除字段
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: info
+        controller: info
+  pattern:
+    dateformat: HH:mm:ss
+
+sky:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: itcast
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    #小程序端口jwt配置
+    user-secret-key: itheima
+    user-ttl: 7200000
+    user-token-name: authentication
+  alioss:
+    endpoint: ${sky.alioss.endpoint}
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
