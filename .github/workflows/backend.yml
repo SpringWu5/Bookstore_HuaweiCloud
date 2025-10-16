@@ -3,10 +3,16 @@ name: Backend CI/CD
 on:
   push:
     branches: [ "master", "main" ]
-    paths: [ 'backend/**' ]
+    paths: 
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
   pull_request:
     branches: [ "master", "main" ]
-    paths: [ 'backend/**' ]
+    paths: 
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  release:
+    types: [published]
 
 jobs:
   test:
