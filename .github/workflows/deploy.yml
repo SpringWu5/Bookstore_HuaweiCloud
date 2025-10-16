@@ -68,7 +68,7 @@ jobs:
         target: "/home/deployer/campus-mall-app/"
         strip_components: 4
 
-    - name: Create necessary directories and set permissions
+    - name: Create necessary directories
       uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ secrets.HOST }}
@@ -76,7 +76,6 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           mkdir -p /home/deployer/campus-mall-app/logs
-          chmod +x /home/deployer/campus-mall-app/*.jar
 
     - name: Start backend application
       uses: appleboy/ssh-action@v0.1.5
@@ -86,7 +85,9 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           cd /home/deployer/campus-mall-app
-          nohup java -jar -Dspring.profiles.active=prod $(basename "${{ steps.get_jar.outputs.jar_file }}") > logs/app.log 2>&1 &
+          JAR_FILE=$(basename "${{ steps.get_jar.outputs.jar_file }}")
+          chmod +x "$JAR_FILE"
+          nohup java -jar -Dspring.profiles.active=prod "$JAR_FILE" > logs/app.log 2>&1 &
           echo "Application started with PID $!"
           sleep 10
 
@@ -123,22 +124,3 @@ jobs:
         retry-delay: 30s
         retry-all: true
 
-    - name: Notify Deployment Success
-      if: success()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: success
-        text: '✅ Application deployment completed successfully to production'
-        channel: '#deployments'
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-    - name: Notify Deployment Failure
-      if: failure()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: failure
-        text: '❌ Application deployment failed to production'
-        channel: '#deployments'
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
