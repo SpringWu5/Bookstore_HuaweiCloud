@@ -99,7 +99,7 @@ jobs:
         script: |
           sudo mkdir -p /var/www/html/
           sudo rm -rf /var/www/html/*
-          sudo cp -r /tmp/frontend_dist/* /var/www/html/
+          sudo cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
           echo "Files moved to nginx directory"
 
     - name: Set proper permissions
