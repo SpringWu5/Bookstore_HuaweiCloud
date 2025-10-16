@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${SKY_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+      url: jdbc:mysql://${SKY_DATASOURCE_HOST:localhost}:${SKY_DATASOURCE_PORT:3306}/${SKY_DATASOURCE_DATABASE:campus_service}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${SKY_DATASOURCE_USERNAME:root}
+      password: ${SKY_DATASOURCE_PASSWORD:123}
+  #文件上传的配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  redis:
+    host: ${SKY_REDIS_HOST:127.0.0.1}
+    port: ${SKY_REDIS_PORT:6379}
+    database: ${SKY_REDIS_DATABASE:10}
+
+mybatis-plus:
+  type-aliases-package: com.sky.entity #别名扫描包
+  mapper-locations: "classpath*:/mapper/**/*.xml" #Mappe.xml文件地址，默认值
+  configuration:
+    map-underscore-to-camel-case: true #开启下划线和驼峰命名映射
+    cache-enabled: false #是否开启二级缓存
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler #开启枚举处理器
+  global-config:
+    db-config:
+      id-type: auto #id为自生成生成
+      update-strategy: not_null #更新策略：只更新非空字段
+      logic-delete-field: deleted #配置逻辑删除字段
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: info
+        controller: info
+  pattern:
+    dateformat: HH:mm:ss
+
+sky:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: ${JWT_ADMIN_SECRET_KEY:itcast}
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    #小程序端口jwt配置
+    user-secret-key: ${JWT_USER_SECRET_KEY:itheima}
+    user-ttl: 7200000
+    user-token-name: authentication
+  alioss:
+    endpoint: ${ALIOSS_ENDPOINT:oss-cn-beijing.aliyuncs.com}
+    access-key-id: ${ALIOSS_ACCESS_KEY_ID:YOUR_ALIBABA_ACCESS_KEY_ID}
+    access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:YOUR_ALIBABA_ACCESS_KEY_SECRET}
+    bucket-name: ${ALIOSS_BUCKET_NAME:web-sky-lm}
