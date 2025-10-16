@@ -105,7 +105,8 @@ jobs:
         done
         
         # Wait for Redis to be ready
-        until redis-cli -h 127.0.0.1 -p 6379 ping; do
+        # Using nc (netcat) instead of redis-cli since it's available in the runner
+        until nc -z 127.0.0.1 6379; do
           echo "Waiting for Redis..."
           sleep 5
         done
