@@ -169,21 +169,43 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         script: |
-          # Stop any existing application processes
+          # Use password authentication to stop the application
           if [ ! -z "${{ secrets.PASSWORD }}" ]; then
-            # Use password for sudo if provided
-            echo "${{ secrets.PASSWORD }}" | sudo -S pkill -f "second-server.*\\.jar" || true
-            sleep 5
-            # Force kill if still running
-            echo "${{ secrets.PASSWORD }}" | sudo -S pkill -9 -f "second-server.*\\.jar" || true
+            # List current processes for debugging
+            echo "Current running Java processes:"
+            ps aux | grep java | grep -v grep || echo "No Java processes found"
+            
+            # Find and kill the application processes by name
+            PIDS=$(pgrep -f "second-server.*\.jar|target.*jar" 2>/dev/null || true)
+            if [ ! -z "$PIDS" ]; then
+              echo "Found processes to kill: $PIDS"
+              
+              # First, try graceful termination with password authentication
+              echo "${{ secrets.PASSWORD }}" | sudo -S kill $PIDS
+              echo "Graceful kill signal sent, waiting 10 seconds..."
+              sleep 10
+              
+              # Check if any processes are still running and force kill if needed
+              PIDS=$(pgrep -f "second-server.*\.jar|target.*jar" 2>/dev/null || true)
+              if [ ! -z "$PIDS" ]; then
+                echo "Some processes still running: $PIDS, attempting force kill..."
+                echo "${{ secrets.PASSWORD }}" | sudo -S kill -9 $PIDS
+                sleep 5
+              fi
+            else
+              echo "No 'second-server' processes found to terminate"
+            fi
+            
+            # Verify the process is stopped
+            echo "Java processes after attempting to stop the application:"
+            ps aux | grep java | grep -v grep || echo "No Java processes found"
           else
-            # Fallback to regular sudo
-            sudo pkill -f "second-server.*\\.jar" || true
+            # Fallback to regular sudo if no password is provided
+            echo "No PASSWORD secret provided, attempting regular sudo..."
+            sudo pkill -f "second-server.*\.jar|target.*jar" || true
             sleep 5
-            sudo pkill -9 -f "second-server.*\\.jar" || true
+            sudo pkill -9 -f "second-server.*\.jar" || true
           fi
-          sleep 2
-          echo "Application stopped successfully"
 
     - name: Create necessary directories and move JAR to root
       uses: appleboy/ssh-action@v0.1.5
