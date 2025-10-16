@@ -41,14 +41,8 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Build with Maven
-      run: mvn -B compile --file pom.xml
-
-    - name: Run tests with coverage
-      run: mvn test -Dmaven.test.failure.ignore=true
-
-    - name: Generate Jacoco coverage report
-      run: mvn jacoco:report
+    - name: Build with Maven and run tests
+      run: mvn -B test jacoco:report --file pom.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -98,26 +92,8 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Wait for MySQL and Redis
-      run: |
-        # Wait for MySQL to be ready
-        until mysqladmin ping -h127.0.0.1 -P3306 -uroot -p123 --silent; do
-          echo "Waiting for MySQL..."
-          sleep 5
-        done
-        
-        # Wait for Redis to be ready
-        # Using nc (netcat) instead of redis-cli since it's available in the runner
-        until nc -z 127.0.0.1 6379; do
-          echo "Waiting for Redis..."
-          sleep 5
-        done
-
-    - name: Build with Maven
-      run: mvn -B verify -DskipTests --file pom.xml
-
-    - name: Run tests with coverage
-      run: mvn test jacoco:report
+    - name: Build with Maven and run integration tests
+      run: mvn -B verify jacoco:report
       env:
         SPRING_PROFILES_ACTIVE: test
         SKY_DATASOURCE_HOST: localhost
@@ -160,9 +136,8 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
 
-    - name: Build with Maven
+    - name: Build and package with Maven
       run: mvn -B package -DskipTests --file pom.xml
-      working-directory: backend
 
     - name: Get JAR file name
       id: get_jar

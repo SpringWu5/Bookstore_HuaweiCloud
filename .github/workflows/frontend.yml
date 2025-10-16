@@ -31,17 +31,11 @@ jobs:
         cache: 'npm'
         cache-dependency-path: 'frontend/package-lock.json'
 
-    - name: Install frontend dependencies
-      run: npm install
-      working-directory: frontend
-
-    - name: Build frontend
-      run: npm run build
-      working-directory: frontend
-
-    - name: Run frontend tests
+    - name: Install and build frontend
       run: |
-        if [ -f "frontend/package.json" ] && grep -q "test:unit" frontend/package.json; then
+        npm install
+        npm run build
+        if [ -f "package.json" ] && grep -q "test:unit" package.json; then
           npm run test:unit
         else
           echo "No test script found, skipping tests"
@@ -66,12 +60,10 @@ jobs:
         cache: 'npm'
         cache-dependency-path: 'frontend/package-lock.json'
 
-    - name: Install frontend dependencies
-      run: npm install
-      working-directory: frontend
-
-    - name: Build frontend
-      run: npm run build
+    - name: Build and upload frontend
+      run: |
+        npm install
+        npm run build
       working-directory: frontend
 
     - name: Upload frontend artifact
@@ -90,11 +82,8 @@ jobs:
         target: "/tmp/frontend_dist/"
         overwrite: true
 
-    # This step requires passwordless sudo access for the following commands:
-    # - mkdir, rm, cp, chown, chmod for /var/www/html/
-    # To grant passwordless sudo access, add the following to /etc/sudoers using 'sudo visudo':
-    # username ALL=(ALL) NOPASSWD: /bin/mkdir, /bin/rm, /bin/cp, /bin/chown, /bin/chmod
-    # Replace 'username' with the actual SSH username
+    # This step now uses password authentication from the PASSWORD secret
+    # Make sure PASSWORD is configured in the GitHub repository secrets
     - name: Move files to nginx directory
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -105,18 +94,12 @@ jobs:
           # Ensure the script runs with proper error handling
           set -e
           
-          # Create nginx directory if it doesn't exist
-          sudo mkdir -p /var/www/html/
-          
-          # Remove existing files
-          sudo rm -rf /var/www/html/*
-          
-          # Copy new files to nginx directory
-          sudo cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
-          
-          # Set appropriate ownership and permissions
-          sudo chown -R www-data:www-data /var/www/html/
-          sudo chmod -R 755 /var/www/html/
+          # Use password authentication for all sudo commands
+          echo "${{ secrets.PASSWORD }}" | sudo -S mkdir -p /var/www/html/
+          echo "${{ secrets.PASSWORD }}" | sudo -S rm -rf /var/www/html/*
+          echo "${{ secrets.PASSWORD }}" | sudo -S cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
+          echo "${{ secrets.PASSWORD }}" | sudo -S chown -R www-data:www-data /var/www/html/
+          echo "${{ secrets.PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/
           
           echo "Files moved to nginx directory successfully"
 
