@@ -184,7 +184,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
-        source: "${{ steps.get_jar.outputs.jar_file }}"
+        source: "backend/${{ steps.get_jar.outputs.jar_file }}"
         target: "/home/deployer/campus-mall-app/"
 
     - name: Stop existing application
@@ -223,7 +223,7 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           cd /home/deployer/campus-mall-app
-          JAR_FILE=$(basename "${{ steps.get_jar.outputs.jar_file }}")
+          JAR_FILE=$(basename "$(ls *.jar | head -n 1)")
           chmod +x "$JAR_FILE"
           nohup java -jar -Dspring.profiles.active=prod "$JAR_FILE" > logs/app.log 2>&1 &
           echo "Application started with PID $!"
