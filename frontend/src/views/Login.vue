@@ -192,7 +192,7 @@ const clearRegisterData = ()=>{
                 </el-form-item>
                 <!-- 登录按钮 -->
                 <el-form-item>
-                    <el-button class="button" type="primary" @click="login" auto-insert-space>Log in</el-button>
+                    <el-button class="button" type="primary" @click="login" auto-insert-space>登录按钮</el-button>
                 </el-form-item>
                 <el-form-item class="flex">
                     <el-link type="info" :underline="false" @click="isRegister = true;clearRegisterData()">
