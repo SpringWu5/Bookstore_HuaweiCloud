@@ -171,11 +171,11 @@ jobs:
         script: |
           # Stop any existing application processes
           sudo pkill -f "second-server.*\\.jar" || true
-        sleep 5
-        # Force kill if still running
-        sudo pkill -9 -f "second-server.*\\.jar" || true
-        sleep 2
-        echo "Application stopped successfully"
+          sleep 5
+          # Force kill if still running
+          sudo pkill -9 -f "second-server.*\\.jar" || true
+          sleep 2
+          echo "Application stopped successfully"
 
     - name: Create necessary directories and move JAR to root
       uses: appleboy/ssh-action@v0.1.5
