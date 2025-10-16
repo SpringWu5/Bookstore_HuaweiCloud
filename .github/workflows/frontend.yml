@@ -88,3 +88,13 @@ jobs:
         key: ${{ secrets.KEY }}
         source: "frontend/dist/*"
         target: "/home/deployer/campus-mall-frontend/"
+
+    - name: Restart nginx
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          sudo systemctl restart nginx
+          echo "Nginx restarted successfully"
