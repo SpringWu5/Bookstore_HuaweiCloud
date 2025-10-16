@@ -168,7 +168,7 @@ const clearRegisterData = ()=>{
             <!-- 登录表单 -->
             <el-form ref="form" size="large" autocomplete="off" v-else   :model="registerData" :rules="rules">
                 <el-form-item>
-                    <h1>登录</h1>
+                    <h1>Log in</h1>
                 </el-form-item>
                 <el-form-item prop="username">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
@@ -192,7 +192,7 @@ const clearRegisterData = ()=>{
                 </el-form-item>
                 <!-- 登录按钮 -->
                 <el-form-item>
-                    <el-button class="button" type="primary" @click="login" auto-insert-space>我的登录</el-button>
+                    <el-button class="button" type="primary" @click="login" auto-insert-space>Log in</el-button>
                 </el-form-item>
                 <el-form-item class="flex">
                     <el-link type="info" :underline="false" @click="isRegister = true;clearRegisterData()">
