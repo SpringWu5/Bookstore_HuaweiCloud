@@ -170,10 +170,18 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           # Stop any existing application processes
-          sudo pkill -f "second-server.*\\.jar" || true
-          sleep 5
-          # Force kill if still running
-          sudo pkill -9 -f "second-server.*\\.jar" || true
+          if [ ! -z "${{ secrets.PASSWORD }}" ]; then
+            # Use password for sudo if provided
+            echo "${{ secrets.PASSWORD }}" | sudo -S pkill -f "second-server.*\\.jar" || true
+            sleep 5
+            # Force kill if still running
+            echo "${{ secrets.PASSWORD }}" | sudo -S pkill -9 -f "second-server.*\\.jar" || true
+          else
+            # Fallback to regular sudo
+            sudo pkill -f "second-server.*\\.jar" || true
+            sleep 5
+            sudo pkill -9 -f "second-server.*\\.jar" || true
+          fi
           sleep 2
           echo "Application stopped successfully"
 
