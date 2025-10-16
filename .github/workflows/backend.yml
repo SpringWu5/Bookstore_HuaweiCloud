@@ -186,7 +186,6 @@ jobs:
         key: ${{ secrets.KEY }}
         source: "${{ steps.get_jar.outputs.jar_file }}"
         target: "/home/deployer/campus-mall-app/"
-        strip_components: 4
 
     - name: Stop existing application
       uses: appleboy/ssh-action@v0.1.5
