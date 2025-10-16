@@ -80,14 +80,27 @@ jobs:
         name: frontend-dist
         path: frontend/dist
 
-    - name: Deploy frontend to nginx directory
+    - name: Deploy frontend to temp directory
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         source: "frontend/dist/*"
-        target: "/var/www/html/"
+        target: "/tmp/frontend_dist/"
+        overwrite: true
+
+    - name: Move files to nginx directory
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          sudo mkdir -p /var/www/html/
+          sudo rm -rf /var/www/html/*
+          sudo cp -r /tmp/frontend_dist/* /var/www/html/
+          echo "Files moved to nginx directory"
 
     - name: Set proper permissions
       uses: appleboy/ssh-action@v0.1.5
