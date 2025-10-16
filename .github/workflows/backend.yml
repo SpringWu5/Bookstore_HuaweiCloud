@@ -169,15 +169,28 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         script: |
+          # First, try graceful shutdown without sudo if possible
           if pgrep -f "second-server.*\.jar"; then
-            sudo pkill -f "second-server.*\.jar"
+            if [ ! -z "${{ secrets.PASSWORD }}" ]; then
+              # Use password authentication if PASSWORD secret is available
+              echo "${{ secrets.PASSWORD }}" | sudo -S pkill -f "second-server.*\.jar"
+            else
+              # Fallback to regular sudo (requires passwordless sudo configuration on target server)
+              sudo pkill -f "second-server.*\.jar"
+            fi
             echo "Waiting for application to stop..."
             sleep 10
           fi
           
           # Check if process is still running and kill it forcefully if needed
           if pgrep -f "second-server.*\.jar"; then
-            sudo pkill -9 -f "second-server.*\.jar"
+            if [ ! -z "${{ secrets.PASSWORD }}" ]; then
+              # Use password authentication if PASSWORD secret is available
+              echo "${{ secrets.PASSWORD }}" | sudo -S pkill -9 -f "second-server.*\.jar"
+            else
+              # Fallback to regular sudo (requires passwordless sudo configuration on target server)
+              sudo pkill -9 -f "second-server.*\.jar"
+            fi
             sleep 5
           fi
 
@@ -200,6 +213,8 @@ jobs:
           cd /home/deployer/campus-mall-app
           JAR_FILE=$(basename "$(ls *.jar | head -n 1)")
           chmod +x "$JAR_FILE"
-          nohup java -jar -Dspring.profiles.active=prod "$JAR_FILE" > logs/app.log 2>&1 &
+          # Set up environment variables for the production configuration
+          export SPRING_PROFILES_ACTIVE=prod
+          nohup java -jar "$JAR_FILE" > logs/app.log 2>&1 &
           echo "Application started with PID $!"
           sleep 10
