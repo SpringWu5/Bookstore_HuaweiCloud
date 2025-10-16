@@ -169,29 +169,34 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         script: |
-          # First, try graceful shutdown without sudo if possible
-          if pgrep -f "second-server.*\.jar"; then
-            if [ ! -z "${{ secrets.PASSWORD }}" ]; then
-              # Use password authentication if PASSWORD secret is available
-              echo "${{ secrets.PASSWORD }}" | sudo -S pkill -f "second-server.*\.jar"
-            else
-              # Fallback to regular sudo (requires passwordless sudo configuration on target server)
-              sudo pkill -f "second-server.*\.jar"
-            fi
-            echo "Waiting for application to stop..."
-            sleep 10
-          fi
-          
-          # Check if process is still running and kill it forcefully if needed
-          if pgrep -f "second-server.*\.jar"; then
-            if [ ! -z "${{ secrets.PASSWORD }}" ]; then
-              # Use password authentication if PASSWORD secret is available
-              echo "${{ secrets.PASSWORD }}" | sudo -S pkill -9 -f "second-server.*\.jar"
-            else
-              # Fallback to regular sudo (requires passwordless sudo configuration on target server)
-              sudo pkill -9 -f "second-server.*\.jar"
-            fi
+          # Use password authentication to stop the application
+          if [ ! -z "${{ secrets.PASSWORD }}" ]; then
+            # List current processes for debugging
+            echo "Current running Java processes:"
+            ps aux | grep java | grep -v grep || true
+            
+            # Kill the application with password authentication
+            echo "${{ secrets.PASSWORD }}" | sudo -S pkill -f "second-server.*\.jar" || echo "pkill command executed"
+            
+            # Wait a moment for the process to be terminated
             sleep 5
+            
+            # Check if the process still exists and force kill if needed
+            if pgrep -f "second-server.*\.jar" > /dev/null; then
+              echo "Application still running, attempting force kill..."
+              echo "${{ secrets.PASSWORD }}" | sudo -S pkill -9 -f "second-server.*\.jar" || echo "Force kill attempted"
+              sleep 5
+            fi
+            
+            # Verify the process is stopped
+            echo "Java processes after attempting to stop the application:"
+            ps aux | grep java | grep -v grep || echo "No Java processes found"
+          else
+            # Fallback to regular sudo if no password is provided
+            echo "No PASSWORD secret provided, attempting regular sudo..."
+            sudo pkill -f "second-server.*\.jar"
+            sleep 5
+            sudo pkill -9 -f "second-server.*\.jar" || true
           fi
 
     - name: Create necessary directories
