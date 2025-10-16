@@ -176,7 +176,7 @@ jobs:
             ps aux | grep java | grep -v grep || echo "No Java processes found"
             
             # Find and kill the application processes by name
-            PIDS=$(pgrep -f "second-server.*\.jar")
+            PIDS=$(pgrep -f "second-server.*\.jar" 2>/dev/null || true)
             if [ ! -z "$PIDS" ]; then
               echo "Found processes to kill: $PIDS"
               
@@ -186,7 +186,7 @@ jobs:
               sleep 10
               
               # Check if any processes are still running and force kill if needed
-              PIDS=$(pgrep -f "second-server.*\.jar" || true)
+              PIDS=$(pgrep -f "second-server.*\.jar" 2>/dev/null || true)
               if [ ! -z "$PIDS" ]; then
                 echo "Some processes still running: $PIDS, attempting force kill..."
                 echo "${{ secrets.PASSWORD }}" | sudo -S kill -9 $PIDS
