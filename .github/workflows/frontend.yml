@@ -90,6 +90,11 @@ jobs:
         target: "/tmp/frontend_dist/"
         overwrite: true
 
+    # This step requires passwordless sudo access for the following commands:
+    # - mkdir, rm, cp, chown, chmod for /var/www/html/
+    # To grant passwordless sudo access, add the following to /etc/sudoers using 'sudo visudo':
+    # username ALL=(ALL) NOPASSWD: /bin/mkdir, /bin/rm, /bin/cp, /bin/chown, /bin/chmod
+    # Replace 'username' with the actual SSH username
     - name: Move files to nginx directory
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -97,10 +102,39 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         script: |
-          # sudo mkdir -p /var/www/html/
+          # Ensure the script runs with proper error handling
+          set -e
+          
+          # Create nginx directory if it doesn't exist
+          sudo mkdir -p /var/www/html/
+          
+          # Remove existing files
           sudo rm -rf /var/www/html/*
+          
+          # Copy new files to nginx directory
           sudo cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
-          echo "Files moved to nginx directory"
+          
+          # Set appropriate ownership and permissions
+          sudo chown -R www-data:www-data /var/www/html/
+          sudo chmod -R 755 /var/www/html/
+          
+          echo "Files moved to nginx directory successfully"
+
+    # Alternative approach if passwordless sudo is not configured on the target server:
+    # - name: Move files to nginx directory (with password authentication)
+    #   uses: appleboy/ssh-action@v0.1.5
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.KEY }}
+    #     script: |
+    #       # Add PASSWORD secret to your GitHub repository secrets
+    #       # Then uncomment the following lines to use password authentication:
+    #       # echo "${{ secrets.PASSWORD }}" | sudo -S rm -rf /var/www/html/*
+    #       # echo "${{ secrets.PASSWORD }}" | sudo -S cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
+    #       # echo "${{ secrets.PASSWORD }}" | sudo -S chown -R www-data:www-data /var/www/html/
+    #       # echo "${{ secrets.PASSWORD }}" | sudo -S chmod -R 755 /var/www/html/
+    #       # echo "Files moved to nginx directory using password authentication"
 
     # - name: Set proper permissions
     #   uses: appleboy/ssh-action@v0.1.5
