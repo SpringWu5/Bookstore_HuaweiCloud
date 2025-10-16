@@ -97,28 +97,28 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         script: |
-          sudo mkdir -p /var/www/html/
+          # sudo mkdir -p /var/www/html/
           sudo rm -rf /var/www/html/*
           sudo cp -r /tmp/frontend_dist/frontend/dist/* /var/www/html/
           echo "Files moved to nginx directory"
 
-    - name: Set proper permissions
-      uses: appleboy/ssh-action@v0.1.5
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        script: |
-          sudo chown -R www-data:www-data /var/www/html/
-          sudo chmod -R 755 /var/www/html/
-          echo "Permissions set for nginx directory"
+    # - name: Set proper permissions
+    #   uses: appleboy/ssh-action@v0.1.5
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.KEY }}
+    #     script: |
+    #       sudo chown -R www-data:www-data /var/www/html/
+    #       sudo chmod -R 755 /var/www/html/
+    #       echo "Permissions set for nginx directory"
 
-    - name: Restart nginx
-      uses: appleboy/ssh-action@v0.1.5
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        script: |
-          sudo systemctl restart nginx
-          echo "Nginx restarted successfully"
+    # - name: Restart nginx
+    #   uses: appleboy/ssh-action@v0.1.5
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     username: ${{ secrets.USERNAME }}
+    #     key: ${{ secrets.KEY }}
+    #     script: |
+    #       sudo systemctl restart nginx
+    #       echo "Nginx restarted successfully"

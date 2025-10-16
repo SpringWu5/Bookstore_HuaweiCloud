@@ -168,7 +168,7 @@ const clearRegisterData = ()=>{
             <!-- 登录表单 -->
             <el-form ref="form" size="large" autocomplete="off" v-else   :model="registerData" :rules="rules">
                 <el-form-item>
-                    <h1>登录吧</h1>
+                    <h1>Log in</h1>
                 </el-form-item>
                 <el-form-item prop="username">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
