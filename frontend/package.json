@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:unit": "vitest --run",
+    "test": "vitest"
   },
   "dependencies": {
     "@vueup/vue-quill": "^1.2.0",
@@ -18,7 +20,10 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",
+    "@vitest/ui": "^0.34.6",
     "sass": "^1.69.4",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.6",
+    "@vue/test-utils": "^2.4.1"
   }
 }
