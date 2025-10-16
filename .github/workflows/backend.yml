@@ -137,7 +137,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
 
     - name: Build and package with Maven
-      run: mvn -B package -DskipTests --file pom.xml
+      run: mvn -B package -DskipTests --file backend/pom.xml
 
     - name: Get JAR file name
       id: get_jar
