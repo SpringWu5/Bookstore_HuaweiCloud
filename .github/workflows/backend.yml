@@ -224,4 +224,3 @@ jobs:
           nohup java -jar -Dspring.profiles.active=prod "$JAR_FILE" > logs/app.log 2>&1 &
           echo "Application started with PID $!"
           sleep 10
-
