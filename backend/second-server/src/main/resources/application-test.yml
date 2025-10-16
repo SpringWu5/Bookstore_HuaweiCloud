@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${SKY_DATASOURCE_HOST:localhost}:${SKY_DATASOURCE_PORT:3306}/${SKY_DATASOURCE_DATABASE:campus_service}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${SKY_DATASOURCE_USERNAME:root}
+      password: ${SKY_DATASOURCE_PASSWORD:123}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  redis:
+    host: ${SKY_REDIS_HOST:localhost}
+    port: ${SKY_REDIS_PORT:6379}
+    database: ${SKY_REDIS_DATABASE:10}
+
+mybatis-plus:
+  type-aliases-package: com.sky.entity
+  mapper-locations: "classpath*:/mapper/**/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    db-config:
+      id-type: auto
+      update-strategy: not_null
+      logic-delete-field: deleted
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: info
+        controller: info
+  pattern:
+    dateformat: HH:mm:ss
+
+sky:
+  jwt:
+    admin-secret-key: itcast
+    admin-ttl: 7200000
+    admin-token-name: token
+    user-secret-key: itheima
+    user-ttl: 7200000
+    user-token-name: authentication
+  alioss:
+    endpoint: ${SKY_ALIOSS_ENDPOINT:oss-cn-beijing.aliyuncs.com}
+    access-key-id: ${SKY_ALIOSS_ACCESS_KEY_ID:YOUR_ALIBABA_ACCESS_KEY_ID}
+    access-key-secret: ${SKY_ALIOSS_ACCESS_KEY_SECRET:YOUR_ALIBABA_ACCESS_KEY_SECRET}
+    bucket-name: ${SKY_ALIOSS_BUCKET_NAME:web-sky-lm}

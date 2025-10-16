@@ -70,3 +70,33 @@ campus-service-dev
 1.  配置 `application-dev.yml` 中的数据库连接信息。
 2.  执行 `second-server` 模块下的 `com.sky.SecondApplication` 启动类。
 3.  项目默认运行在 `8080` 端口。
+
+## 5. CI/CD 配置
+
+本项目已配置 GitHub Actions 进行持续集成和部署，包含以下工作流：
+
+### 工作流
+
+- **CI 工作流**: 在每次推送到主分支或拉取请求时运行，包括构建和测试
+- **PR 测试工作流**: 为拉取请求运行完整的测试套件，包括数据库服务
+- **部署工作流**: 在创建标签时自动部署到生产环境
+- **Docker 工作流**: 构建并推送 Docker 镜像到 DockerHub
+
+### 配置密钥
+
+在 GitHub 仓库设置中需要配置以下密钥：
+
+- `HOST` - 生产服务器主机名/IP
+- `USERNAME` - SSH 用户名
+- `KEY` - SSH 私钥
+- `SLACK_WEBHOOK_URL` - 用于通知的 Slack webhook（可选）
+- `DOCKERHUB_USERNAME` - DockerHub 用户名
+- `DOCKERHUB_TOKEN` - DockerHub 访问令牌
+
+### 部署
+
+创建格式为 `v*` 的标签（例如 `v1.0.0`）以触发部署到生产环境。
+
+### 详细文档
+
+参见 `CICD.md` 文件获取更详细的 CI/CD 配置和使用说明。
