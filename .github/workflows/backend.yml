@@ -176,7 +176,7 @@ jobs:
             ps aux | grep java | grep -v grep || echo "No Java processes found"
             
             # Find and kill the application processes by name
-            PIDS=$(pgrep -f "second-server.*\.jar" 2>/dev/null || true)
+            PIDS=$(pgrep -f "second-server.*\.jar|target.*jar" 2>/dev/null || true)
             if [ ! -z "$PIDS" ]; then
               echo "Found processes to kill: $PIDS"
               
@@ -186,7 +186,7 @@ jobs:
               sleep 10
               
               # Check if any processes are still running and force kill if needed
-              PIDS=$(pgrep -f "second-server.*\.jar" 2>/dev/null || true)
+              PIDS=$(pgrep -f "second-server.*\.jar|target.*jar" 2>/dev/null || true)
               if [ ! -z "$PIDS" ]; then
                 echo "Some processes still running: $PIDS, attempting force kill..."
                 echo "${{ secrets.PASSWORD }}" | sudo -S kill -9 $PIDS
@@ -202,12 +202,12 @@ jobs:
           else
             # Fallback to regular sudo if no password is provided
             echo "No PASSWORD secret provided, attempting regular sudo..."
-            sudo pkill -f "second-server.*\.jar" || true
+            sudo pkill -f "second-server.*\.jar|target.*jar" || true
             sleep 5
             sudo pkill -9 -f "second-server.*\.jar" || true
           fi
 
-    - name: Create necessary directories
+    - name: Create necessary directories and move JAR to root
       uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ secrets.HOST }}
@@ -215,6 +215,14 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           mkdir -p /home/deployer/campus-mall-app/logs
+          # Find and move the JAR file to the root directory for easier management
+          JAR_PATH=$(find /home/deployer/campus-mall-app -name "*.jar" -type f | head -n 1)
+          if [ -n "$JAR_PATH" ]; then
+            echo "Moving JAR file from $JAR_PATH to root directory"
+            mv "$JAR_PATH" /home/deployer/campus-mall-app/
+            # Remove the nested directories that are no longer needed
+            rm -rf /home/deployer/campus-mall-app/backend/
+          fi
 
     - name: Start application
       uses: appleboy/ssh-action@v0.1.5
@@ -224,7 +232,14 @@ jobs:
         key: ${{ secrets.KEY }}
         script: |
           cd /home/deployer/campus-mall-app
-          JAR_FILE=$(basename "$(ls *.jar | head -n 1)")
+          # Find the JAR file in the root directory
+          JAR_FILE=$(basename "$(find . -maxdepth 1 -name "*.jar" -type f | head -n 1)")
+          if [ -z "$JAR_FILE" ]; then
+            echo "ERROR: No JAR file found in /home/deployer/campus-mall-app!"
+            exit 1
+          fi
+          echo "Found JAR file: $JAR_FILE"
+          
           chmod +x "$JAR_FILE"
           # Set up environment variables for the production configuration
           export SPRING_PROFILES_ACTIVE=prod
