@@ -40,14 +40,6 @@ jobs:
     - name: Generate Jacoco coverage report
       run: mvn jacoco:report
 
-    - name: Publish Test Report
-      uses: scacap/action-surefire-report@v1
-      if: always()
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        report_paths: '**/target/surefire-reports/TEST-*.xml'
-        fail_if_no_tests: false  # Change this to not fail when no tests found in some modules
-        
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       if: always()
