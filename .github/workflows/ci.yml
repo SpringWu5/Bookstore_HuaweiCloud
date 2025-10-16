@@ -1,4 +1,4 @@
-name: CI with Maven and NPM
+name: Integration CI
 
 on:
   push:

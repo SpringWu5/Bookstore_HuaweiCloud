@@ -6,7 +6,7 @@ on:
 
 jobs:
   backend:
-    name: Backend Tests
+    name: Backend Integration Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -74,13 +74,6 @@ jobs:
         SKY_REDIS_HOST: localhost
         SKY_REDIS_PORT: 6379
 
-    - name: Publish Test Report
-      uses: scacap/action-surefire-report@v1
-      if: always()
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        report_paths: '**/target/surefire-reports/TEST-*.xml'
-        
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       if: always()
