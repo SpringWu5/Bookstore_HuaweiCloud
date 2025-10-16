@@ -80,14 +80,25 @@ jobs:
         name: frontend-dist
         path: frontend/dist
 
-    - name: Deploy frontend to server
+    - name: Deploy frontend to nginx directory
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         source: "frontend/dist/*"
-        target: "/home/deployer/campus-mall-frontend/"
+        target: "/var/www/html/"
+
+    - name: Set proper permissions
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          sudo chown -R www-data:www-data /var/www/html/
+          sudo chmod -R 755 /var/www/html/
+          echo "Permissions set for nginx directory"
 
     - name: Restart nginx
       uses: appleboy/ssh-action@v0.1.5
