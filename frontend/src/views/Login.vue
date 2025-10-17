@@ -91,6 +91,7 @@ const register = async () => {
 //绑定数据,复用注册表单的数据模型
 //表单数据校验
 //登录函数
+//
 //引入token
 import {useTokenStore} from '@/stores/token.js'
 import{useRouter} from 'vue-router'
@@ -168,7 +169,7 @@ const clearRegisterData = ()=>{
             <!-- 登录表单 -->
             <el-form ref="form" size="large" autocomplete="off" v-else   :model="registerData" :rules="rules">
                 <el-form-item>
-                    <h1>Log in</h1>
+                    <h1>登录 in</h1>
                 </el-form-item>
                 <el-form-item prop="username">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
